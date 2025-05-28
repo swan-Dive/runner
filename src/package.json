@@ -1,0 +1,21 @@
+{
+  "name": "dino-runner-game",
+  "version": "1.0.0",
+  "description": "Embeddable Dino runner game like Chrome offline game",
+  "main": "src/DinoRunner.js",
+  "type": "module",
+  "keywords": [
+    "dino",
+    "runner",
+    "game",
+    "canvas",
+    "endless",
+    "javascript"
+  ],
+  "author": "nikita.tatyankin@x5.ru",
+  "license": "MIT",
+  "devDependencies": {
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3"
+  }
+}

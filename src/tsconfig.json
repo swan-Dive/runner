@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "outDir": "../dist", // Output JavaScript to a separate folder
+    "rootDir": "./", // Source TypeScript files are in current dir
+    "strict": true,
+    "moduleResolution": "node"
+  },
+  "include": ["*.ts", "../index.ts"], // Include all .ts files in src and subfolders
+  "exclude": ["../dist"] // Exclude the output folder, NOT src!
+}
