@@ -1,31 +1,33 @@
 import { Player } from "../../Player.js";
-import { GameObject } from "../GameObject.js";
+import { BaseCollectable } from "./BaseCollectable.js";
 
-export class DefaultObstacle extends GameObject {
-  height: number;
-  width: number;
+const WIDTH = 32;
+const HEIGHT = 32;
+
+export class BitcoinCollectable extends BaseCollectable {
+  width: number = WIDTH;
+  height: number = HEIGHT;
+
+  coinValue: number = 100;
   image: HTMLImageElement;
 
   constructor(x: number, y: number) {
     super(x, y);
 
     this.image = new Image();
-    this.image.src = "./dist/assets/cactus.png";
-
-    this.height = 57;
-    this.width = 32;
+    this.image.src = "./dist/assets/collectables/bitcoin.png";
   }
 
   draw(ctx: CanvasRenderingContext2D | null) {
     if (!ctx) {
       throw new Error("No context provided");
     }
-    ctx.fillStyle = "green";
 
     ctx.drawImage(
       this.image,
+
       this.x,
-      this.y - this.height + 10,
+      this.y,
       this.width,
       this.height
     );
@@ -34,8 +36,8 @@ export class DefaultObstacle extends GameObject {
   isCollision(player: Player) {
     return (
       player.state.x < this.x &&
-      player.state.x + player.state.width - 25 > this.x &&
-      player.state.y < this.y - this.height + 40 &&
+      player.state.x + player.state.width > this.x &&
+      player.state.y < this.y - this.height + 60 &&
       player.state.y + player.state.height > this.y - this.height + 10
     );
   }

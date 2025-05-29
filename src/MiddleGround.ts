@@ -1,29 +1,31 @@
-const BACKGROUND_IMAGE_WIDTH = 2400;
+const MIDDLEGROUND_IMAGE_WIDTH = 3200;
 
-export class Background {
-  img: HTMLImageElement;
+export class MiddleGround {
   width: number;
   height: number;
-  offset = 0;
+  img: HTMLImageElement = new Image();
+  offset: number = 0;
   constructor(width: number, height: number) {
     this.width = width;
     this.height = height;
-    this.img = new Image();
-    this.img.src = "./dist/assets/background_long.png";
-    this.offset = 0;
+    this.img.src = "./dist/assets/game/stores.png";
   }
 
   reset() {
     this.offset = 0;
   }
 
-  draw(ctx: CanvasRenderingContext2D | null, gameEnding: boolean): void {
+  draw(
+    ctx: CanvasRenderingContext2D | null,
+    gameEnding: boolean,
+    speed: number
+  ): void {
     if (!ctx) {
       throw new Error("No context provided");
     }
     if (!gameEnding) {
-      this.offset += 0.2;
-      if (this.offset >= BACKGROUND_IMAGE_WIDTH - this.width) {
+      this.offset += speed / 2;
+      if (this.offset >= MIDDLEGROUND_IMAGE_WIDTH - this.width) {
         this.offset = 0;
       }
     }
@@ -34,9 +36,9 @@ export class Background {
       this.width,
       this.height,
       0,
-      0,
+      this.height / 2,
       this.width,
-      this.height
+      this.height / 2
     );
   }
 }

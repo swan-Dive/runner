@@ -51,12 +51,20 @@ export class GoldenCollectable extends BaseCollectable {
     );
   }
 
+  updateFrameIndex() {
+    this.frameIndex = (this.frameIndex + 1) % this.spriteImagesCount;
+  }
+
+  getCurrentImageCoords() {
+    return this.spriteMapper[this.frameIndex];
+  }
+
   isCollision(player: Player) {
     return (
       player.state.x < this.x &&
-      player.state.x + player.state.width - 25 > this.x &&
-      player.state.y < this.y - this.height + 40 &&
-      player.state.y + player.state.height > this.y - this.height + 10
+      player.state.x + player.state.width > this.x &&
+      player.state.y < this.y - this.height - 40 &&
+      player.state.y + player.state.height > this.y - this.height
     );
   }
 }

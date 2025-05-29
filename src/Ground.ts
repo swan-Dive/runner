@@ -4,6 +4,7 @@ import { Player } from "./Player.js";
 class Pebble extends GameObject {
   width: number;
   height: number;
+
   constructor(x: number, y: number) {
     super(x, y);
     this.width = parseInt((Math.random() * 4).toFixed(0));
@@ -22,6 +23,9 @@ class Pebble extends GameObject {
   }
 }
 
+const GROUND_SPRITE_HEIGHT = 46;
+const GROUND_SPRITE_WIDTH = 1195;
+
 export class Ground {
   x: number;
   y: number;
@@ -29,8 +33,10 @@ export class Ground {
   height: number;
   pebbles: Pebble[];
   spawnTimer: number;
+  offset: number = 0;
+  image: HTMLImageElement = new Image();
 
-  constructor(y: number, width: number, height: number = 2) {
+  constructor(y: number, width: number, height: number = GROUND_SPRITE_HEIGHT) {
     this.y = y;
     this.x = 0;
     this.width = width;
@@ -42,6 +48,7 @@ export class Ground {
       new Pebble(width - 10, y + 10),
     ];
     this.spawnTimer = 0;
+    this.image.src = "./dist/assets/game/ground.png";
   }
 
   update(speed: number) {
@@ -66,14 +73,42 @@ export class Ground {
     this.pebbles = this.pebbles.filter((pebble) => pebble.isOOB());
   }
 
-  draw(ctx: CanvasRenderingContext2D | null) {
+  getCurrentImage() {
+    return this.image;
+  }
+
+  draw(
+    ctx: CanvasRenderingContext2D | null,
+    gameEnding: boolean,
+    speed: number
+  ) {
     if (!ctx) {
       throw new Error("No context provided");
     }
+
+    if (!gameEnding) {
+      this.offset += speed;
+      if (this.offset >= GROUND_SPRITE_WIDTH - this.width) {
+        this.offset = 0;
+      }
+    }
+
+    ctx.drawImage(
+      this.getCurrentImage(),
+      this.offset,
+      0,
+      this.width,
+      this.height,
+      0,
+      this.y - 25,
+      this.width,
+      this.height
+    );
+
     ctx.fillStyle = "#ccc";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-    this.pebbles.forEach((pebble) => {
-      pebble.draw(ctx);
-    });
+
+    // this.pebbles.forEach((pebble) => {
+    //   pebble.draw(ctx);
+    // });
   }
 }

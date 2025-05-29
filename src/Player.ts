@@ -42,14 +42,12 @@ export class Player {
   state: PlayerState;
   jumpStrength: number;
   groundY: number;
-  is_plumiting: boolean;
   jump_sound: HTMLAudioElement;
   shrink_sound: HTMLAudioElement;
   constructor(groundY: number) {
     this.state = { ...INITIAL_PLAYER_STATE };
     this.groundY = groundY;
-    this.is_plumiting = false;
-    this.jumpStrength = -8;
+    this.jumpStrength = -12;
     this.state.images.run.src = "./dist/assets/player/sprite.png";
     this.state.images.jump.src = "./dist/assets/player/sprite.png";
     this.state.images.shrink.src = "./dist/assets/player/explosion.png";
@@ -83,7 +81,7 @@ export class Player {
   }
 
   plumit() {
-    this.is_plumiting = true;
+    this.state.is_plumiting = true;
   }
 
   unduck() {
@@ -100,8 +98,8 @@ export class Player {
     this.state.vy = this.jumpStrength;
     this.state.jumping = true;
     if (play_sound) {
-      const sound: any = this.jump_sound.cloneNode(); // Create a fresh copy
-      sound.volume = 0.5;
+      const sound: any = this.jump_sound.cloneNode() as HTMLAudioElement; // Create a fresh copy
+      sound.volume = 0.4;
       sound.play();
     }
   }
@@ -110,13 +108,19 @@ export class Player {
     this.state = { ...INITIAL_PLAYER_STATE };
   }
 
-  update(gameGravity: number, gameEnding: boolean) {
+  update(
+    gameGravity: number,
+    gameEnding: boolean,
+    timeDelta: number,
+    jumpStrength: number
+  ) {
+    this.jumpStrength = jumpStrength;
     if (this.state.jumping) {
-      this.state.y += this.state.vy / 2;
+      this.state.y += (this.state.vy / 4) * 3;
       this.state.vy += gameGravity;
       this._jump_animation(gameEnding);
     } else {
-      this._update_animation();
+      this._update_animation(timeDelta);
     }
   }
 
@@ -170,14 +174,13 @@ export class Player {
       this.getHeight()
     );
     if (this.state.shrinkFrameIndex < SHRINK_SPRITE_IMAGES_COUNT) {
-      console.log(this.state.shrinkFrameIndex);
       this.drawExplosion(ctx);
     }
   }
 
-  _update_animation() {
+  _update_animation(timeDelta: number) {
     this.state.frameTimer++;
-    if (this.state.frameTimer > 12) {
+    if (this.state.frameTimer > 1 / timeDelta / 8) {
       this.state.frameTimer = 0;
       this.state.frameIndex =
         (this.state.frameIndex + 1) % PLAYER_SPRITE_IMAGES_COUNT;
@@ -206,6 +209,7 @@ export class Player {
 
   die() {
     this.jump();
+    this.plumit();
     setTimeout(() => {
       this.state.jumping = false;
     }, 1000);
