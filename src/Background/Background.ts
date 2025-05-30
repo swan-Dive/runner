@@ -55,7 +55,7 @@ class Building {
 
 export class Background {
   img: HTMLImageElement;
-  buildings_image: HTMLImageElement;
+  // buildings_image: HTMLImageElement;
   width: number;
   frameCount: number = 0;
   height: number;
@@ -65,9 +65,9 @@ export class Background {
     this.width = width;
     this.height = height;
     this.img = new Image();
-    this.buildings_image = new Image();
+    // this.buildings_image = new Image();
     this.img.src = "./dist/assets/background_long.png";
-    this.buildings_image.src = "./dist/assets/game/stores2.png";
+    // this.buildings_image.src = "./dist/assets/game/stores2.png";
     this.offset = 0;
   }
 
@@ -75,27 +75,27 @@ export class Background {
     this.offset = 0;
   }
 
-  update(timeDelta: number, gameEnding: boolean) {
-    // this.frameCount++;
-    // if (this.frameCount > (1 / timeDelta / 8) * 500 + Math.random() * 3000) {
-    //   this.frameCount = 0;
-    //   this.buildings.push(
-    //     new Building(
-    //       this.buildings_image,
-    //       BUILDINGS_MAPPER[0][0],
-    //       BUILDINGS_MAPPER[0][1],
-    //       BUILDINGS_MAPPER[0][2],
-    //       BUILDINGS_MAPPER[0][3],
-    //       this.width
-    //     )
-    //   );
-    //   console.log("SWAPN");
-    // }
-    // this.buildings.forEach((building) => {
-    //   building.update(gameEnding);
-    // });
-    // this.buildings = this.buildings.filter((building) => !building.isOOB());
-  }
+  // update(timeDelta: number, gameEnding: boolean) {
+  //   // this.frameCount++;
+  //   // if (this.frameCount > (1 / timeDelta / 8) * 500 + Math.random() * 3000) {
+  //   //   this.frameCount = 0;
+  //   //   this.buildings.push(
+  //   //     new Building(
+  //   //       this.buildings_image,
+  //   //       BUILDINGS_MAPPER[0][0],
+  //   //       BUILDINGS_MAPPER[0][1],
+  //   //       BUILDINGS_MAPPER[0][2],
+  //   //       BUILDINGS_MAPPER[0][3],
+  //   //       this.width
+  //   //     )
+  //   //   );
+  //   //   console.log("SWAPN");
+  //   // }
+  //   // this.buildings.forEach((building) => {
+  //   //   building.update(gameEnding);
+  //   // });
+  //   // this.buildings = this.buildings.filter((building) => !building.isOOB());
+  // }
 
   draw(ctx: CanvasRenderingContext2D | null, gameEnding: boolean): void {
     if (!ctx) {

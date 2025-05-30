@@ -7,7 +7,6 @@ import { Obstacle404 } from "./GameObjects/Obstacles/Obstacle404.js";
 import { EnergyCollectable } from "./GameObjects/Collectables/EnergyCollectable.js";
 import { BitcoinCollectable } from "./GameObjects/Collectables/BitcoinCollectable.js";
 import { PizzaCollectable } from "./GameObjects/Collectables/PizzaCollectable.js";
-import { MiddleGround } from "./MiddleGround.js";
 const SPEED = 500;
 const GROUND_HEIGHT = 20;
 const DEFAULT_GRAVITY = 0.15;
@@ -30,7 +29,6 @@ export class Game {
         this.canvas = new Canvas(container, { width: 800, height: 200 });
         this.ground = new Ground(this.canvas.getHeight() - GROUND_HEIGHT, this.canvas.getWidth());
         this.background = new Background(this.canvas.getWidth(), this.canvas.getHeight() - GROUND_HEIGHT);
-        this.middleground = new MiddleGround(this.canvas.getWidth(), this.canvas.getHeight() - GROUND_HEIGHT);
         this.player = new Player(this.ground.y);
         this.highScore = this.loadHighScore();
         this._bindEvents();
@@ -60,7 +58,6 @@ export class Game {
         this.stop();
         this.player.reset();
         this.background.reset();
-        this.middleground.reset();
         this.gravity = DEFAULT_GRAVITY;
         this.score = 0;
         this.gameEnding = false;
@@ -230,7 +227,6 @@ export class Game {
             (this.player.state.is_plumiting ? 0.3 : 0) +
             (this.gameEnding ? (SPEED * timeDelta) / 10 : 0), this.gameEnding, timeDelta, this.interpolate(accSpeed, 2.8, 11, -8, -17), this.musicOn);
         this.ground.update(accSpeed);
-        this.background.update(timeDelta, this.gameEnding);
         this._handleSpawnObstacle(timeDelta);
         this._handleSpawnCollectables(timeDelta);
         if (this.gameEnding)

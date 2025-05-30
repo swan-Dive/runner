@@ -13,7 +13,6 @@ import { BaseCollectable } from "./GameObjects/Collectables/BaseCollectable.js";
 import { EnergyCollectable } from "./GameObjects/Collectables/EnergyCollectable.js";
 import { BitcoinCollectable } from "./GameObjects/Collectables/BitcoinCollectable.js";
 import { PizzaCollectable } from "./GameObjects/Collectables/PizzaCollectable.js";
-import { MiddleGround } from "./MiddleGround.js";
 
 const SPEED = 500;
 const GROUND_HEIGHT = 20;
@@ -26,7 +25,6 @@ export class Game {
   obstacles: GameObject[] = [];
   ground: Ground;
   background: Background;
-  middleground: MiddleGround;
   running: boolean = false;
   obstacleSpawnTimer: number = 0;
   collectableSpawnTimer: number = 0;
@@ -53,10 +51,6 @@ export class Game {
       this.canvas.getHeight() - GROUND_HEIGHT
     );
 
-    this.middleground = new MiddleGround(
-      this.canvas.getWidth(),
-      this.canvas.getHeight() - GROUND_HEIGHT
-    );
     this.player = new Player(this.ground.y);
     this.highScore = this.loadHighScore();
     this._bindEvents();
@@ -92,7 +86,6 @@ export class Game {
     this.stop();
     this.player.reset();
     this.background.reset();
-    this.middleground.reset();
     this.gravity = DEFAULT_GRAVITY;
     this.score = 0;
     this.gameEnding = false;
@@ -335,7 +328,6 @@ export class Game {
       this.musicOn
     );
     this.ground.update(accSpeed);
-    this.background.update(timeDelta, this.gameEnding);
 
     this._handleSpawnObstacle(timeDelta);
     this._handleSpawnCollectables(timeDelta);
