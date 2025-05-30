@@ -151,7 +151,7 @@ export class Game {
     window.addEventListener("keyup", (e) => {
       if (this.gameEnding || !this.running) return;
       if (e.code === "ArrowDown" || e.key === "S" || e.key === "s") {
-        this.player.unduck();
+        if (!this.player.state.is_plumiting) this.player.unduck();
         this.gravity = DEFAULT_GRAVITY;
         this.player.state.is_plumiting = false;
       }
@@ -314,8 +314,9 @@ export class Game {
     const accSpeed = this.speed * timeDelta * 1;
 
     this.player.update(
-      this.interpolate(accSpeed, 2.8, 11, 0.2, 0.9) +
-        (this.player.state.is_plumiting ? 0.3 : 0),
+      this.interpolate(accSpeed, 2.8, 11, 0.2, 1.1) +
+        (this.player.state.is_plumiting ? 0.3 : 0) +
+        (this.gameEnding ? (SPEED * timeDelta) / 10 : 0),
       this.gameEnding,
       timeDelta,
       this.interpolate(accSpeed, 2.8, 11, -8, -17)
