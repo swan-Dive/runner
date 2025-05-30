@@ -32,10 +32,16 @@ export class GoldenCollectable extends BaseCollectable {
         }
         ctx.drawImage(this.image, coords[0], coords[1], this.width, this.height, this.x, this.y, this.width, this.height);
     }
+    updateFrameIndex() {
+        this.frameIndex = (this.frameIndex + 1) % this.spriteImagesCount;
+    }
+    getCurrentImageCoords() {
+        return this.spriteMapper[this.frameIndex];
+    }
     isCollision(player) {
         return (player.state.x < this.x &&
-            player.state.x + player.state.width - 25 > this.x &&
-            player.state.y < this.y - this.height + 40 &&
-            player.state.y + player.state.height > this.y - this.height + 10);
+            player.state.x + player.state.width > this.x &&
+            player.state.y < this.y - this.height - 40 &&
+            player.state.y + player.state.height > this.y - this.height);
     }
 }

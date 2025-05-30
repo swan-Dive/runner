@@ -8,9 +8,6 @@ export class Background {
         this.img.src = "./dist/assets/background_long.png";
         this.offset = 0;
     }
-    getCurrentImage() {
-        return this.img;
-    }
     reset() {
         this.offset = 0;
     }
@@ -21,10 +18,9 @@ export class Background {
         if (!gameEnding) {
             this.offset += 0.2;
             if (this.offset >= BACKGROUND_IMAGE_WIDTH - this.width) {
-                console.log(this.offset, BACKGROUND_IMAGE_WIDTH - this.width);
                 this.offset = 0;
             }
         }
-        ctx.drawImage(this.getCurrentImage(), this.offset, 0, this.width, this.height, 0, 0, this.width, this.height);
+        ctx.drawImage(this.img, this.offset, 0, this.width, this.height, 0, 0, this.width, this.height);
     }
 }

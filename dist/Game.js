@@ -1,11 +1,14 @@
-import { Background } from "./Background.js";
+import { Background } from "./Background/Background.js";
 import { Canvas } from "./Canvas.js";
 import { Ground } from "./Ground.js";
-import { DefaultObstacle } from "./GameObjects/Obstacles/DefaultObstacle.js";
+import { Obstacle500 } from "./GameObjects/Obstacles/Obstacle500.js";
 import { DEFAULT_PLAYER_DUCKING_HEIGHT, DEFAULT_PLAYER_HEIGHT, Player, } from "./Player.js";
-import { FlyingObstacle } from "./GameObjects/Obstacles/FlyingObstacle.js";
-import { GoldenCollectable } from "./GameObjects/Collectables/CoinCollectables.js";
-const SPEED = 3.5;
+import { Obstacle404 } from "./GameObjects/Obstacles/Obstacle404.js";
+import { EnergyCollectable } from "./GameObjects/Collectables/EnergyCollectable.js";
+import { BitcoinCollectable } from "./GameObjects/Collectables/BitcoinCollectable.js";
+import { PizzaCollectable } from "./GameObjects/Collectables/PizzaCollectable.js";
+import { MiddleGround } from "./MiddleGround.js";
+const SPEED = 500;
 const GROUND_HEIGHT = 20;
 const DEFAULT_GRAVITY = 0.15;
 export class Game {
@@ -16,14 +19,17 @@ export class Game {
         this.obstacleSpawnTimer = 0;
         this.collectableSpawnTimer = 0;
         this.score = 0;
-        this.interval = null;
+        this.scoreInterval = null;
         this.timers = [];
         this.speed = SPEED;
         this.gameEnding = false;
         this.collectables = [];
+        this.lastTime = Date.now();
+        this.paused = false;
         this.canvas = new Canvas(container, { width: 800, height: 200 });
         this.ground = new Ground(this.canvas.getHeight() - GROUND_HEIGHT, this.canvas.getWidth());
         this.background = new Background(this.canvas.getWidth(), this.canvas.getHeight() - GROUND_HEIGHT);
+        this.middleground = new MiddleGround(this.canvas.getWidth(), this.canvas.getHeight() - GROUND_HEIGHT);
         this.player = new Player(this.ground.y);
         this.highScore = this.loadHighScore();
         this._bindEvents();
@@ -43,8 +49,8 @@ export class Game {
         this.running = false;
         if (this.score > this.highScore)
             this.saveHighScore(this.score);
-        if (this.interval) {
-            clearInterval(this.interval);
+        if (this.scoreInterval) {
+            clearInterval(this.scoreInterval);
         }
         this.timers.forEach((item) => clearTimeout(item));
         this.timers = [];
@@ -53,6 +59,7 @@ export class Game {
         this.stop();
         this.player.reset();
         this.background.reset();
+        this.middleground.reset();
         this.gravity = DEFAULT_GRAVITY;
         this.score = 0;
         this.gameEnding = false;
@@ -62,6 +69,17 @@ export class Game {
         this.start();
     }
     _bindEvents() {
+        window.addEventListener("blur", () => {
+            this.paused = true;
+            if (this.scoreInterval) {
+                clearInterval(this.scoreInterval);
+                this.scoreInterval = null;
+            }
+        });
+        window.addEventListener("focus", () => {
+            this.paused = false;
+            requestAnimationFrame(() => this._gameLoop());
+        });
         window.addEventListener("keydown", (e) => {
             if (this.gameEnding)
                 return;
@@ -101,17 +119,34 @@ export class Game {
     _keepScore(cls) {
         cls.score += 1;
     }
-    _handleSpawnCollectables() {
+    chosenCollectable(collectablesToChoseFrom, weights) {
+        const total = weights.reduce((a, b) => a + b, 0);
+        const r = Math.random() * total;
+        let sum = 0;
+        for (let i = 0; i < collectablesToChoseFrom.length; i++) {
+            sum += weights[i];
+            if (r < sum)
+                return collectablesToChoseFrom[i];
+        }
+    }
+    _handleSpawnCollectables(timeDelta) {
+        const collectablesToChoseFrom = [
+            BitcoinCollectable,
+            EnergyCollectable,
+            PizzaCollectable,
+        ];
+        const weights = [0.2, 0.5, 0.3]; // 30% chance for Bitcoin, 70% for Energy
         this.collectableSpawnTimer++;
-        if (this.collectableSpawnTimer > 100 + Math.random() * 2000) {
-            console.log("here");
+        if (this.obstacleSpawnTimer >
+            (1 / timeDelta / 8) * 5 + Math.random() * 3000) {
             const r = parseInt((Math.random() * 2).toFixed(0));
+            const collectable = this.chosenCollectable(collectablesToChoseFrom, weights);
             switch (r) {
                 case 0:
-                    this.collectables.push(new GoldenCollectable(this.canvas.getWidth(), this.ground.y - DEFAULT_PLAYER_HEIGHT + 30));
+                    this.collectables.push(new collectable(this.canvas.getWidth(), this.ground.y - DEFAULT_PLAYER_HEIGHT + 20));
                     break;
                 case 1:
-                    this.collectables.push(new GoldenCollectable(this.canvas.getWidth(), this.ground.y - DEFAULT_PLAYER_HEIGHT - 30));
+                    this.collectables.push(new collectable(this.canvas.getWidth(), this.ground.y - DEFAULT_PLAYER_HEIGHT - 30));
                     break;
                 default:
                     break;
@@ -119,26 +154,27 @@ export class Game {
             this.collectableSpawnTimer = 0;
         }
     }
-    _handleSpawnObstacle() {
+    _handleSpawnObstacle(timeDelta) {
         this.obstacleSpawnTimer++;
-        if (this.obstacleSpawnTimer > 100 + Math.random() * 1000) {
+        if (this.obstacleSpawnTimer >
+            (1 / timeDelta / 8) * 5 + Math.random() * 1000) {
             if (this.score < 100) {
-                this.obstacles.push(new DefaultObstacle(this.canvas.getWidth(), this.ground.y));
+                this.obstacles.push(new Obstacle500(this.canvas.getWidth(), this.ground.y));
             }
             else {
-                const r = parseInt((Math.random() * 4).toFixed(0));
+                const r = parseInt((Math.random() * 5).toFixed(0));
                 switch (r) {
-                    case 0:
-                        this.obstacles.push(new DefaultObstacle(this.canvas.getWidth(), this.ground.y));
+                    case 2:
+                        this.obstacles.push(new Obstacle500(this.canvas.getWidth() + 150, this.ground.y));
                         break;
                     case 1:
-                        this.obstacles.push(new FlyingObstacle(this.canvas.getWidth(), this.ground.y - (DEFAULT_PLAYER_HEIGHT / 4) * 3));
-                        break;
-                    case 2:
-                        this.obstacles.push(new FlyingObstacle(this.canvas.getWidth(), this.ground.y - (DEFAULT_PLAYER_DUCKING_HEIGHT / 4) * 1));
+                        this.obstacles.push(new Obstacle404(this.canvas.getWidth() + 150, this.ground.y - (DEFAULT_PLAYER_HEIGHT / 4) * 3));
                         break;
                     case 3:
-                        this.obstacles.push(new FlyingObstacle(this.canvas.getWidth(), this.ground.y - (DEFAULT_PLAYER_HEIGHT * 3) / 2));
+                        this.obstacles.push(new Obstacle404(this.canvas.getWidth() + 150, this.ground.y - DEFAULT_PLAYER_DUCKING_HEIGHT / 4));
+                        break;
+                    case 4:
+                        this.obstacles.push(new Obstacle404(this.canvas.getWidth() + 150, this.ground.y - (DEFAULT_PLAYER_HEIGHT * 3) / 2));
                         break;
                     default:
                         break;
@@ -147,25 +183,52 @@ export class Game {
             this.obstacleSpawnTimer = 0;
         }
     }
+    interpolate(v, iMin, iMax, oMin, oMax) {
+        return oMin + ((v - iMin) * (oMax - oMin)) / (iMax - iMin);
+    }
     _gameLoop() {
-        if (!this.running)
+        if (!this.running || this.paused)
             return;
-        this._update();
-        this._render();
+        const timeStamp = Date.now();
+        const deltaTime = Math.max(Math.min((timeStamp - this.lastTime) / 1000, 0.1), 0.006);
+        this.lastTime = timeStamp;
+        this._update(deltaTime);
+        this._render(deltaTime);
         requestAnimationFrame(() => this._gameLoop());
     }
-    _update() {
-        this.player.update(this.gravity, this.gameEnding);
-        this.ground.update(this.speed);
-        this._handleSpawnObstacle();
-        this._handleSpawnCollectables();
+    _update(timeDelta) {
+        if (this.score >= 1000 && this.speed != SPEED + 250 && !this.gameEnding) {
+            this.updateScoreIntervalAndSpeed(SPEED + 250, 30);
+        }
+        else if (this.score >= 500 &&
+            this.score < 1000 &&
+            this.speed != SPEED + 150 &&
+            !this.gameEnding) {
+            this.updateScoreIntervalAndSpeed(SPEED + 150, 40);
+        }
+        else if (this.score >= 200 &&
+            this.score < 500 &&
+            this.speed != SPEED + 100 &&
+            !this.gameEnding) {
+            this.updateScoreIntervalAndSpeed(SPEED + 100, 45);
+        }
+        else if (this.scoreInterval == null && !this.gameEnding) {
+            this.updateScoreIntervalAndSpeed(SPEED, 50);
+        }
+        const accSpeed = this.speed * timeDelta * 1;
+        this.player.update(this.interpolate(accSpeed, 2.8, 11, 0.2, 0.9) +
+            (this.player.state.is_plumiting ? 0.3 : 0), this.gameEnding, timeDelta, this.interpolate(accSpeed, 2.8, 11, -8, -17));
+        this.ground.update(accSpeed);
+        this.background.update(timeDelta, this.gameEnding);
+        this._handleSpawnObstacle(timeDelta);
+        this._handleSpawnCollectables(timeDelta);
         if (this.gameEnding)
             return;
         // Move obstacles
-        this.obstacles.forEach((obs) => obs.move(this.speed));
+        this.obstacles.forEach((obs) => obs.move(accSpeed));
         this.obstacles = this.obstacles.filter((obs) => obs.isOOB());
         // Move collectables
-        this.collectables.forEach((col) => col.move(this.speed));
+        this.collectables.forEach((col) => col.move(accSpeed));
         this.collectables.forEach((col) => {
             this.obstacles.forEach((obj) => {
                 if (col.isObstacleCollision(obj)) {
@@ -186,7 +249,8 @@ export class Game {
             if (col.isCollision(this.player)) {
                 this.score += col.getCoinValue();
                 to_delete.push(col);
-                const sound = this.coin_pickup_sound.cloneNode(); // Create a fresh copy
+                const sound = this.coin_pickup_sound.cloneNode();
+                sound.volume = 0.5;
                 sound.play();
             }
         }
@@ -196,20 +260,24 @@ export class Game {
         this.player.die();
         this.speed = 0;
         this.gameEnding = true;
+        this.gameOverSound.volume = 0.5;
         this.gameOverSound.play();
-        if (this.interval) {
-            clearInterval(this.interval);
+        if (this.scoreInterval) {
+            clearInterval(this.scoreInterval);
+            this.scoreInterval = null;
         }
         setTimeout(() => {
             this.stop();
             this.gameEnding = false;
-        }, 1000);
+        }, 2000);
     }
-    _render() {
+    _render(timeDelta) {
+        const accSpeed = this.speed * timeDelta * 1;
         this.canvas.clearContext();
         let ctx = this.canvas.getContext();
         this.background.draw(ctx, this.gameEnding);
-        this.ground.draw(ctx);
+        // this.middleground.draw(ctx, this.gameEnding, accSpeed);
+        this.ground.draw(ctx, this.gameEnding, accSpeed);
         this.player.draw(ctx);
         this.canvas.drawScore(this.score, this.highScore);
         this.obstacles.forEach((obs) => obs.draw(ctx));
@@ -218,33 +286,18 @@ export class Game {
             this.canvas.drawGameOver();
         }
     }
+    updateScoreIntervalAndSpeed(speedToHave, intervalToHave) {
+        this.speed = speedToHave;
+        if (this.scoreInterval) {
+            clearInterval(this.scoreInterval);
+        }
+        this.scoreInterval = setInterval(this._keepScore, intervalToHave, this);
+    }
     start() {
         if (this.running)
             return;
         this.running = true;
-        this.interval = setInterval(this._keepScore, 50, this);
-        let t1 = setTimeout(() => {
-            this.speed = SPEED + 0.5;
-            if (this.interval) {
-                clearInterval(this.interval);
-                this.interval = setInterval(this._keepScore, 45, this);
-            }
-        }, 10000);
-        let t2 = setTimeout(() => {
-            this.speed = SPEED + 1;
-            if (this.interval) {
-                clearInterval(this.interval);
-                this.interval = setInterval(this._keepScore, 40, this);
-            }
-        }, 40000);
-        let t3 = setTimeout(() => {
-            this.speed = SPEED + 1.5;
-            if (this.interval) {
-                clearInterval(this.interval);
-                this.interval = setInterval(this._keepScore, 30, this);
-            }
-        }, 50000);
-        this.timers.push(t1, t2, t3);
+        this.scoreInterval = setInterval(this._keepScore, 50, this);
         requestAnimationFrame(() => this._gameLoop());
     }
     saveHighScore(score) {

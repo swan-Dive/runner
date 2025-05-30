@@ -16,8 +16,12 @@ class Pebble extends GameObject {
         return false;
     }
 }
+const GROUND_SPRITE_HEIGHT = 46;
+const GROUND_SPRITE_WIDTH = 1195;
 export class Ground {
-    constructor(y, width, height = 2) {
+    constructor(y, width, height = GROUND_SPRITE_HEIGHT) {
+        this.offset = 0;
+        this.image = new Image();
         this.y = y;
         this.x = 0;
         this.width = width;
@@ -29,6 +33,7 @@ export class Ground {
             new Pebble(width - 10, y + 10),
         ];
         this.spawnTimer = 0;
+        this.image.src = "./dist/assets/game/ground.png";
     }
     update(speed) {
         this.spawnTimer++;
@@ -43,14 +48,23 @@ export class Ground {
         });
         this.pebbles = this.pebbles.filter((pebble) => pebble.isOOB());
     }
-    draw(ctx) {
+    getCurrentImage() {
+        return this.image;
+    }
+    draw(ctx, gameEnding, speed) {
         if (!ctx) {
             throw new Error("No context provided");
         }
+        if (!gameEnding) {
+            this.offset += speed;
+            if (this.offset >= GROUND_SPRITE_WIDTH - this.width) {
+                this.offset = 0;
+            }
+        }
+        ctx.drawImage(this.getCurrentImage(), this.offset, 0, this.width, this.height, 0, this.y - 25, this.width, this.height);
         ctx.fillStyle = "#ccc";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        this.pebbles.forEach((pebble) => {
-            pebble.draw(ctx);
-        });
+        // this.pebbles.forEach((pebble) => {
+        //   pebble.draw(ctx);
+        // });
     }
 }
