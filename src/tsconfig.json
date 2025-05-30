@@ -7,6 +7,6 @@
     "strict": true,
     "moduleResolution": "node"
   },
-  "include": ["*.ts", "../index.ts"], // Include all .ts files in src and subfolders
+  "include": ["*.ts", "../index.ts", "Background/Background.ts"], // Include all .ts files in src and subfolders
   "exclude": ["../dist"] // Exclude the output folder, NOT src!
 }

@@ -1,4 +1,4 @@
-import { Background } from "./Background.js";
+import { Background } from "./Background/Background.js";
 import { Canvas } from "./Canvas.js";
 import { Ground } from "./Ground.js";
 import { Obstacle500 } from "./GameObjects/Obstacles/Obstacle500.js";
@@ -321,6 +321,8 @@ export class Game {
       this.interpolate(accSpeed, 2.8, 11, -8, -17)
     );
     this.ground.update(accSpeed);
+    this.background.update(timeDelta, this.gameEnding);
+
     this._handleSpawnObstacle(timeDelta);
     this._handleSpawnCollectables(timeDelta);
     if (this.gameEnding) return;
