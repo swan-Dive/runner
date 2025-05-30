@@ -26,6 +26,7 @@ export class Game {
         this.collectables = [];
         this.lastTime = Date.now();
         this.paused = false;
+        this.musicOn = true;
         this.canvas = new Canvas(container, { width: 800, height: 200 });
         this.ground = new Ground(this.canvas.getHeight() - GROUND_HEIGHT, this.canvas.getWidth());
         this.background = new Background(this.canvas.getWidth(), this.canvas.getHeight() - GROUND_HEIGHT);
@@ -80,6 +81,14 @@ export class Game {
             this.paused = false;
             requestAnimationFrame(() => this._gameLoop());
         });
+        this.canvas.container.addEventListener("click", (ev) => {
+            if (ev.offsetX > 0 &&
+                ev.offsetX < 48 &&
+                ev.offsetY > 0 &&
+                ev.offsetY <= 32) {
+                this.musicOn = !this.musicOn;
+            }
+        });
         window.addEventListener("keydown", (e) => {
             if (this.gameEnding)
                 return;
@@ -90,7 +99,7 @@ export class Game {
                 !this.player.is_jumping() &&
                 !this.player.is_ducking() &&
                 this.running) {
-                this.player.jump(true);
+                this.player.jump(this.musicOn);
             }
             if ((e.code === "Space" || e.key === " ") && !this.running) {
                 this._restart();
@@ -98,7 +107,7 @@ export class Game {
             if ((e.code === "ArrowDown" || e.key === "S" || e.key === "s") &&
                 !this.player.is_jumping() &&
                 this.running) {
-                this.player.duck();
+                this.player.duck(this.musicOn);
             }
             if ((e.code === "ArrowDown" || e.key === "S" || e.key === "s") &&
                 this.player.is_jumping()) {
@@ -219,7 +228,7 @@ export class Game {
         const accSpeed = this.speed * timeDelta * 1;
         this.player.update(this.interpolate(accSpeed, 2.8, 11, 0.2, 1.1) +
             (this.player.state.is_plumiting ? 0.3 : 0) +
-            (this.gameEnding ? (SPEED * timeDelta) / 10 : 0), this.gameEnding, timeDelta, this.interpolate(accSpeed, 2.8, 11, -8, -17));
+            (this.gameEnding ? (SPEED * timeDelta) / 10 : 0), this.gameEnding, timeDelta, this.interpolate(accSpeed, 2.8, 11, -8, -17), this.musicOn);
         this.ground.update(accSpeed);
         this.background.update(timeDelta, this.gameEnding);
         this._handleSpawnObstacle(timeDelta);
@@ -251,9 +260,11 @@ export class Game {
             if (col.isCollision(this.player)) {
                 this.score += col.getCoinValue();
                 to_delete.push(col);
-                const sound = this.coin_pickup_sound.cloneNode();
-                sound.volume = 0.5;
-                sound.play();
+                if (this.musicOn) {
+                    const sound = this.coin_pickup_sound.cloneNode();
+                    sound.volume = 0.5;
+                    sound.play();
+                }
             }
         }
         this.collectables = this.collectables.filter((col) => !to_delete.includes(col));
@@ -262,8 +273,10 @@ export class Game {
         this.player.die();
         this.speed = 0;
         this.gameEnding = true;
-        this.gameOverSound.volume = 0.5;
-        this.gameOverSound.play();
+        if (this.musicOn) {
+            this.gameOverSound.volume = 0.5;
+            this.gameOverSound.play();
+        }
         if (this.scoreInterval) {
             clearInterval(this.scoreInterval);
             this.scoreInterval = null;
@@ -281,6 +294,7 @@ export class Game {
         // this.middleground.draw(ctx, this.gameEnding, accSpeed);
         this.ground.draw(ctx, this.gameEnding, accSpeed);
         this.player.draw(ctx);
+        this.canvas.drawMusicIcon(this.musicOn);
         this.canvas.drawScore(this.score, this.highScore);
         this.obstacles.forEach((obs) => obs.draw(ctx));
         this.collectables.forEach((obs) => obs.draw(ctx));

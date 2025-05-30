@@ -41,6 +41,7 @@ export class Game {
   coin_pickup_sound: HTMLAudioElement;
   lastTime: number = Date.now();
   paused: boolean = false;
+  musicOn: boolean = true;
   constructor(container: HTMLDivElement) {
     this.canvas = new Canvas(container, { width: 800, height: 200 });
     this.ground = new Ground(
@@ -117,6 +118,17 @@ export class Game {
       requestAnimationFrame(() => this._gameLoop());
     });
 
+    this.canvas.container.addEventListener("click", (ev) => {
+      if (
+        ev.offsetX > 0 &&
+        ev.offsetX < 48 &&
+        ev.offsetY > 0 &&
+        ev.offsetY <= 32
+      ) {
+        this.musicOn = !this.musicOn;
+      }
+    });
+
     window.addEventListener("keydown", (e) => {
       if (this.gameEnding) return;
       if (
@@ -128,7 +140,7 @@ export class Game {
         !this.player.is_ducking() &&
         this.running
       ) {
-        this.player.jump(true);
+        this.player.jump(this.musicOn);
       }
       if ((e.code === "Space" || e.key === " ") && !this.running) {
         this._restart();
@@ -138,7 +150,7 @@ export class Game {
         !this.player.is_jumping() &&
         this.running
       ) {
-        this.player.duck();
+        this.player.duck(this.musicOn);
       }
       if (
         (e.code === "ArrowDown" || e.key === "S" || e.key === "s") &&
@@ -319,7 +331,8 @@ export class Game {
         (this.gameEnding ? (SPEED * timeDelta) / 10 : 0),
       this.gameEnding,
       timeDelta,
-      this.interpolate(accSpeed, 2.8, 11, -8, -17)
+      this.interpolate(accSpeed, 2.8, 11, -8, -17),
+      this.musicOn
     );
     this.ground.update(accSpeed);
     this.background.update(timeDelta, this.gameEnding);
@@ -357,10 +370,12 @@ export class Game {
       if (col.isCollision(this.player)) {
         this.score += col.getCoinValue();
         to_delete.push(col);
-        const sound: HTMLAudioElement =
-          this.coin_pickup_sound.cloneNode() as HTMLAudioElement;
-        sound.volume = 0.5;
-        sound.play();
+        if (this.musicOn) {
+          const sound: HTMLAudioElement =
+            this.coin_pickup_sound.cloneNode() as HTMLAudioElement;
+          sound.volume = 0.5;
+          sound.play();
+        }
       }
     }
 
@@ -373,8 +388,10 @@ export class Game {
     this.player.die();
     this.speed = 0;
     this.gameEnding = true;
-    this.gameOverSound.volume = 0.5;
-    this.gameOverSound.play();
+    if (this.musicOn) {
+      this.gameOverSound.volume = 0.5;
+      this.gameOverSound.play();
+    }
     if (this.scoreInterval) {
       clearInterval(this.scoreInterval);
       this.scoreInterval = null;
@@ -394,6 +411,7 @@ export class Game {
     // this.middleground.draw(ctx, this.gameEnding, accSpeed);
     this.ground.draw(ctx, this.gameEnding, accSpeed);
     this.player.draw(ctx);
+    this.canvas.drawMusicIcon(this.musicOn);
     this.canvas.drawScore(this.score, this.highScore);
 
     this.obstacles.forEach((obs) => obs.draw(ctx));

@@ -4,7 +4,8 @@ export class Canvas {
   container: HTMLDivElement;
   canvasDIV: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D | null;
-
+  musicOnImage: HTMLImageElement = new Image();
+  musicOffCross: HTMLImageElement = new Image();
   constructor(container: HTMLDivElement, options: CanvasOptions) {
     this.container = container;
     this.canvasDIV = document.createElement("canvas");
@@ -12,6 +13,8 @@ export class Canvas {
     this.canvasDIV.width = options.width || 800;
     this.canvasDIV.height = options.height || 200;
     this.container.appendChild(this.canvasDIV);
+    this.musicOnImage.src = "./dist/assets/game/music_on.png";
+    this.musicOffCross.src = "./dist/assets/game/music_off_cross.png";
   }
 
   getWidth() {
@@ -19,6 +22,12 @@ export class Canvas {
   }
   getHeight() {
     return this.canvasDIV.height;
+  }
+
+  drawMusicIcon(musicIsOn: boolean) {
+    let ctx = this.getContext();
+    ctx.drawImage(this.musicOnImage, 0, 0, 32, 32);
+    if (!musicIsOn) ctx.drawImage(this.musicOffCross, 32, 8, 16, 16);
   }
 
   drawScore(score: number, highScore: number) {

@@ -65,7 +65,7 @@ export class Player {
     return this.state.ducking;
   }
 
-  duck() {
+  duck(musicOn: boolean) {
     this.state.height = DEFAULT_PLAYER_DUCKING_HEIGHT;
     this.state.width = DEFAULT_PLAYER_DUCKING_WIDTH;
     this.state.x = DEFAULT_PLAYER_DUCKING_X;
@@ -73,8 +73,10 @@ export class Player {
     if (!this.is_ducking()) {
       this.state.shrinkFrameIndex = 0;
       this.state.shrinkFrameTimer = 0;
-      this.shrink_sound.volume = 0.5;
-      this.shrink_sound.play();
+      if (musicOn) {
+        this.shrink_sound.volume = 0.5;
+        this.shrink_sound.play();
+      }
     }
 
     this.state.ducking = true;
@@ -112,13 +114,14 @@ export class Player {
     gameGravity: number,
     gameEnding: boolean,
     timeDelta: number,
-    jumpStrength: number
+    jumpStrength: number,
+    musicOn: boolean
   ) {
     this.jumpStrength = jumpStrength;
     if (this.state.jumping) {
       this.state.y += (this.state.vy / 4) * 3;
       this.state.vy += gameGravity;
-      this._jump_animation(gameEnding);
+      this._jump_animation(gameEnding, musicOn);
     } else {
       this._update_animation(timeDelta);
     }
@@ -194,7 +197,7 @@ export class Player {
     }
   }
 
-  _jump_animation(gameEnding: boolean) {
+  _jump_animation(gameEnding: boolean, musicOn: boolean) {
     if (gameEnding) return;
     if (this.state.y >= this.groundY - this.state.height) {
       this.state.y = this.groundY - this.state.height;
@@ -202,7 +205,7 @@ export class Player {
       this.state.jumping = false;
       if (this.state.is_plumiting) {
         this.state.is_plumiting = false;
-        this.duck();
+        this.duck(musicOn);
       }
     }
   }

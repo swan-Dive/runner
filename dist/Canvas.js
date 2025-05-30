@@ -1,17 +1,27 @@
 export class Canvas {
     constructor(container, options) {
+        this.musicOnImage = new Image();
+        this.musicOffCross = new Image();
         this.container = container;
         this.canvasDIV = document.createElement("canvas");
         this.ctx = this.canvasDIV.getContext("2d");
         this.canvasDIV.width = options.width || 800;
         this.canvasDIV.height = options.height || 200;
         this.container.appendChild(this.canvasDIV);
+        this.musicOnImage.src = "./dist/assets/game/music_on.png";
+        this.musicOffCross.src = "./dist/assets/game/music_off_cross.png";
     }
     getWidth() {
         return this.canvasDIV.width;
     }
     getHeight() {
         return this.canvasDIV.height;
+    }
+    drawMusicIcon(musicIsOn) {
+        let ctx = this.getContext();
+        ctx.drawImage(this.musicOnImage, 0, 0, 32, 32);
+        if (!musicIsOn)
+            ctx.drawImage(this.musicOffCross, 32, 8, 16, 16);
     }
     drawScore(score, highScore) {
         let ctx = this.getContext();
