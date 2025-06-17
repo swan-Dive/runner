@@ -8,7 +8,7 @@ export class Obstacle404 extends GameObject {
 
   constructor(x: number, y: number) {
     super(x, y);
-    this.height = 19;
+    this.height = 64;
     this.width = 62;
     this.img = new Image();
     this.img.src = "./dist/assets/obstacles/404.png";

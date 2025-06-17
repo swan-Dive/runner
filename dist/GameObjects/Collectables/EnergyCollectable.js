@@ -1,6 +1,6 @@
 import { BaseCollectable } from "./BaseCollectable.js";
-const WIDTH = 48;
-const HEIGHT = 48;
+const WIDTH = 64;
+const HEIGHT = 64;
 export class EnergyCollectable extends BaseCollectable {
     constructor(x, y) {
         super(x, y);
@@ -19,7 +19,7 @@ export class EnergyCollectable extends BaseCollectable {
     isCollision(player) {
         return (player.state.x < this.x &&
             player.state.x + player.state.width > this.x &&
-            player.state.y < this.y - this.height + 60 &&
-            player.state.y + player.state.height > this.y - this.height + 10);
+            player.state.y < this.y - this.height + 100 &&
+            player.state.y + player.state.height > this.y - this.height);
     }
 }

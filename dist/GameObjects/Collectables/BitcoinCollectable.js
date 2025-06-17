@@ -1,14 +1,14 @@
 import { BaseCollectable } from "./BaseCollectable.js";
 const WIDTH = 32;
 const HEIGHT = 32;
-export class BitcoinCollectable extends BaseCollectable {
+export class CoffeeCollectable extends BaseCollectable {
     constructor(x, y) {
         super(x, y);
         this.width = WIDTH;
         this.height = HEIGHT;
         this.coinValue = 100;
         this.image = new Image();
-        this.image.src = "./dist/assets/collectables/bitcoin.png";
+        this.image.src = "./dist/assets/collectables/coffee.png";
     }
     draw(ctx) {
         if (!ctx) {

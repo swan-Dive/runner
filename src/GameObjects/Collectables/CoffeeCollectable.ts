@@ -4,7 +4,7 @@ import { BaseCollectable } from "./BaseCollectable.js";
 const WIDTH = 32;
 const HEIGHT = 32;
 
-export class BitcoinCollectable extends BaseCollectable {
+export class CoffeeCollectable extends BaseCollectable {
   width: number = WIDTH;
   height: number = HEIGHT;
 
@@ -15,7 +15,7 @@ export class BitcoinCollectable extends BaseCollectable {
     super(x, y);
 
     this.image = new Image();
-    this.image.src = "./dist/assets/collectables/bitcoin.png";
+    this.image.src = "./dist/assets/collectables/coffee.png";
   }
 
   draw(ctx: CanvasRenderingContext2D | null) {

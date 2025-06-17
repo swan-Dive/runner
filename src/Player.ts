@@ -10,12 +10,21 @@ export const DEFAULT_PLAYER_DUCKING_Y = 144;
 export const DEFAULT_PLAYER_DUCKING_X = 32;
 export const PLAYER_SPRITE_IMAGES_COUNT = 8;
 export const SHRINK_SPRITE_IMAGES_COUNT = 7;
-export const PLAYER_SOURCE_WIDTH = 58;
-export const PLAYER_SOURCE_HEIGHT = 60;
-export const PLAYER_SOURCE_Y_OFFSET = 0;
-export const PLAYER_SOURCE_X_OFFSET = 0;
+export const PLAYER_SOURCE_WIDTH = 65;
+export const PLAYER_SOURCE_HEIGHT = 81;
+export const PLAYER_SOURCE_Y_OFFSET = 30;
+export const PLAYER_SOURCE_X_OFFSET = 39;
 
-const PLAYER_SPRITE_X_MAPPER = [0, 65, 130, 195, 260, 325, 390, 455];
+const PLAYER_SPRITE_X_MAPPER = [
+  PLAYER_SOURCE_X_OFFSET,
+  192,
+  340,
+  477,
+  618,
+  768,
+  918,
+  1053,
+];
 const SHRINK_SPRITE_X_MAPPER = [0, 480, 960, 1440, 1920, 2400, 2880];
 
 const INITIAL_PLAYER_STATE = {
@@ -183,7 +192,8 @@ export class Player {
 
   _update_animation(timeDelta: number) {
     this.state.frameTimer++;
-    if (this.state.frameTimer > 1 / timeDelta / 8) {
+    if (this.state.frameTimer > 1 / timeDelta / 6) {
+      //     if (this.state.frameTimer > 1 / timeDelta / 8) {
       this.state.frameTimer = 0;
       this.state.frameIndex =
         (this.state.frameIndex + 1) % PLAYER_SPRITE_IMAGES_COUNT;

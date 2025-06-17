@@ -1,7 +1,7 @@
 import { Background } from "./Background/Background.js";
 import { Canvas } from "./Canvas.js";
 import { Ground } from "./Ground.js";
-import { Obstacle500 } from "./GameObjects/Obstacles/Obstacle500.js";
+import { ObstacleBug } from "./GameObjects/Obstacles/ObstacleBug.js";
 import { GameObject } from "./GameObjects/GameObject.js";
 import {
   DEFAULT_PLAYER_DUCKING_HEIGHT,
@@ -11,8 +11,8 @@ import {
 import { Obstacle404 } from "./GameObjects/Obstacles/Obstacle404.js";
 import { BaseCollectable } from "./GameObjects/Collectables/BaseCollectable.js";
 import { EnergyCollectable } from "./GameObjects/Collectables/EnergyCollectable.js";
-import { BitcoinCollectable } from "./GameObjects/Collectables/BitcoinCollectable.js";
-import { PizzaCollectable } from "./GameObjects/Collectables/PizzaCollectable.js";
+import { CoffeeCollectable } from "./GameObjects/Collectables/CoffeeCollectable.js";
+import { BagelCollectable } from "./GameObjects/Collectables/BagelCollectable.js";
 
 const SPEED = 500;
 const GROUND_HEIGHT = 20;
@@ -179,9 +179,9 @@ export class Game {
 
   _handleSpawnCollectables(timeDelta: number) {
     const collectablesToChoseFrom = [
-      BitcoinCollectable,
+      CoffeeCollectable,
       EnergyCollectable,
-      PizzaCollectable,
+      BagelCollectable,
     ];
     const weights = [0.2, 0.5, 0.3]; // 30% chance for Bitcoin, 70% for Energy
 
@@ -227,26 +227,18 @@ export class Game {
     ) {
       if (this.score < 100) {
         this.obstacles.push(
-          new Obstacle500(this.canvas.getWidth(), this.ground.y)
+          new ObstacleBug(this.canvas.getWidth(), this.ground.y)
         );
       } else {
-        const r = parseInt((Math.random() * 5).toFixed(0));
+        const r = parseInt((Math.random() * 4).toFixed(0));
 
         switch (r) {
           case 2:
             this.obstacles.push(
-              new Obstacle500(this.canvas.getWidth() + 150, this.ground.y)
+              new ObstacleBug(this.canvas.getWidth() + 150, this.ground.y)
             );
             break;
           case 1:
-            this.obstacles.push(
-              new Obstacle404(
-                this.canvas.getWidth() + 150,
-                this.ground.y - (DEFAULT_PLAYER_HEIGHT / 4) * 3
-              )
-            );
-            break;
-          case 3:
             this.obstacles.push(
               new Obstacle404(
                 this.canvas.getWidth() + 150,
@@ -254,7 +246,7 @@ export class Game {
               )
             );
             break;
-          case 4:
+          case 3:
             this.obstacles.push(
               new Obstacle404(
                 this.canvas.getWidth() + 150,
@@ -372,7 +364,7 @@ export class Game {
     }
 
     this.collectables = this.collectables.filter(
-      (col) => !to_delete.includes(col)
+      (col) => !(to_delete.indexOf(col) !== -1)
     );
   }
 

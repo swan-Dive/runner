@@ -1,4 +1,4 @@
-const BACKGROUND_IMAGE_WIDTH = 2400;
+const BACKGROUND_IMAGE_WIDTH = 2241;
 const BUILDINGS_MAPPER = [[0, 31, 450, 169]];
 
 class Building {
@@ -66,7 +66,7 @@ export class Background {
     this.height = height;
     this.img = new Image();
     // this.buildings_image = new Image();
-    this.img.src = "./dist/assets/background_long.png";
+    this.img.src = "./dist/assets/game/background.png";
     // this.buildings_image.src = "./dist/assets/game/stores2.png";
     this.offset = 0;
   }
@@ -102,7 +102,7 @@ export class Background {
       throw new Error("No context provided");
     }
     if (!gameEnding) {
-      this.offset += 0.2;
+      this.offset += 1;
       if (this.offset >= BACKGROUND_IMAGE_WIDTH - this.width) {
         this.offset = 0;
       }
@@ -117,7 +117,7 @@ export class Background {
       0,
       0,
       this.width,
-      this.height
+      this.height - 25
     );
 
     // this.buildings.forEach((building) => {

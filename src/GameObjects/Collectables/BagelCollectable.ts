@@ -4,7 +4,7 @@ import { BaseCollectable } from "./BaseCollectable.js";
 const WIDTH = 48;
 const HEIGHT = 48;
 
-export class PizzaCollectable extends BaseCollectable {
+export class BagelCollectable extends BaseCollectable {
   width: number = WIDTH;
   height: number = HEIGHT;
 
@@ -15,7 +15,7 @@ export class PizzaCollectable extends BaseCollectable {
     super(x, y);
 
     this.image = new Image();
-    this.image.src = "./dist/assets/collectables/pizza_slice.png";
+    this.image.src = "./dist/assets/collectables/bagel.png";
   }
 
   draw(ctx: CanvasRenderingContext2D | null) {

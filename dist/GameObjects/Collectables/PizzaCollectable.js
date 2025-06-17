@@ -8,7 +8,7 @@ export class PizzaCollectable extends BaseCollectable {
         this.height = HEIGHT;
         this.coinValue = 75;
         this.image = new Image();
-        this.image.src = "./dist/assets/collectables/pizza_slice.png";
+        this.image.src = "./dist/assets/collectables/bagel.png";
     }
     draw(ctx) {
         if (!ctx) {
